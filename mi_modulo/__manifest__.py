@@ -8,8 +8,8 @@
     "data": [
         "security/ir.model.access.csv",
         "views/res_partner_views.xml",
-        "views/crm_lead_views.xml",
         "views/mx_ped_operacion_views.xml",
+        "views/crm_lead_views.xml",
     ],
     "application": False,
     "installable": True,
