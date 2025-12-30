@@ -4,6 +4,26 @@
     <field name="model">crm.lead</field>
     <field name="inherit_id" ref="crm.crm_lead_view_form"/>
     <field name="arch" type="xml">
+
+      <!-- SMART BUTTON -->
+      <xpath expr="//div[@class='oe_button_box']" position="inside">
+        <button type="action"
+                name="%(mi_modulo_aduana.mx_ped_operacion_action)d"
+                class="oe_stat_button"
+                icon="fa-file-text-o"
+                context="{'search_default_lead_id': active_id}">
+          <field string="Pedimentos" name="x_ped_operacion_count" widget="statinfo"/>
+        </button>
+      </xpath>
+
+      <!-- BOTÓN EN HEADER -->
+      <xpath expr="//header" position="inside">
+        <button name="action_crear_pedimento"
+                type="object"
+                string="Crear pedimento"
+                class="btn-primary"/>
+      </xpath>
+
       <xpath expr="//notebook" position="inside">
 
         <page string="Operación" name="mi_modulo_operacion">
@@ -27,7 +47,7 @@
             <group string="Clasificación">
               <field name="x_regimen"/>
               <field name="x_tipo_despacho"/>
-              <field name="x_aduana" placeholder="Ej. Tijuana, Ensenada, Lázaro Cárdenas"/>
+              <field name="x_aduana" placeholder="Ej. 070 / Tijuana"/>
               <field name="x_patente_agente"/>
               <field name="x_clave_pedimento"/>
             </group>
@@ -112,8 +132,7 @@
             <group string="Guías">
               <field name="x_bl_awb"/>
               <field name="x_house_bl_awb"/>
-              <field name="x_booking"
-                     modifiers='{"invisible":[["x_modo_transporte","!=","maritimo"]]}'/>
+              <field name="x_booking" modifiers='{"invisible":[["x_modo_transporte","!=","maritimo"]]}'/>
             </group>
             <group string="Equipo">
               <field name="x_num_contenedor"/>
@@ -122,16 +141,31 @@
           </group>
         </page>
 
-        <page string="Pedimento" name="mi_modulo_pedimento">
+        <!-- ✅ Pedimento en LEAD: SOLO RESUMEN (READ-ONLY) -->
+        <page string="Pedimento (resumen)" name="mi_modulo_pedimento_resumen">
           <group>
-            <group string="Datos">
-              <field name="x_num_pedimento"/>
-              <field name="x_fecha_pago_pedimento"/>
-              <field name="x_semaforo"/>
-              <field name="x_fecha_liberacion"/>
+            <group string="Último pedimento ligado" col="2">
+              <field name="x_last_ped_operacion_id" readonly="1"/>
             </group>
-            <group string="Incidencias">
-              <field name="x_incidente_text" placeholder="Describe incidencias, rectificaciones, revisiones, etc."/>
+          </group>
+
+          <group>
+            <group string="Datos oficiales (último)">
+              <field name="x_ped_num_pedimento" readonly="1"/>
+              <field name="x_ped_fecha_pago" readonly="1"/>
+              <field name="x_ped_semaforo" readonly="1"/>
+              <field name="x_ped_fecha_liberacion" readonly="1"/>
+            </group>
+            <group string="Referencia">
+              <field name="x_ped_aduana_clave" readonly="1"/>
+              <field name="x_ped_patente" readonly="1"/>
+              <field name="x_ped_clave_pedimento" readonly="1"/>
+            </group>
+          </group>
+
+          <group>
+            <group string="Nota">
+              <label string="Para editar/crear pedimentos usa la pestaña 'Pedimentos'."/>
             </group>
           </group>
         </page>
@@ -140,8 +174,7 @@
           <group>
             <group string="Cobro">
               <field name="x_factura_emitida"/>
-              <field name="x_factura_ref"
-                     modifiers='{"invisible":[["x_factura_emitida","=",false]]}'/>
+              <field name="x_factura_ref" modifiers='{"invisible":[["x_factura_emitida","=",false]]}'/>
               <field name="x_metodo_cobro"/>
               <field name="x_pago_confirmado"/>
             </group>
@@ -153,7 +186,6 @@
 
         <page string="Importación" name="mi_modulo_importacion"
               modifiers='{"invisible":[["x_tipo_operacion","!=","importacion"]]}'>
-
           <group>
             <group string="Compra / proveedor">
               <field name="x_purchase_order"/>
@@ -189,12 +221,10 @@
               <field name="x_direccion_entrega_final"/>
             </group>
           </group>
-
         </page>
 
         <page string="Exportación" name="mi_modulo_exportacion"
               modifiers='{"invisible":[["x_tipo_operacion","!=","exportacion"]]}'>
-
           <group>
             <group string="Venta">
               <field name="x_sales_order"/>
@@ -221,7 +251,74 @@
               <field name="x_prueba_entrega"/>
             </group>
           </group>
+        </page>
 
+        <!-- ✅ Alta/edición real -->
+        <page string="Pedimentos" name="mi_modulo_pedimentos_rel">
+          <group>
+            <group string="Acciones">
+              <button name="action_crear_pedimento"
+                      type="object"
+                      string="Crear pedimento desde este lead"
+                      class="btn-primary"/>
+            </group>
+          </group>
+
+          <field name="x_ped_operacion_ids"
+                 nolabel="1"
+                 context="{'default_lead_id': active_id}"
+                 mode="tree,form">
+
+            <tree editable="bottom">
+              <field name="name"/>
+              <field name="tipo_operacion"/>
+              <field name="regimen"/>
+              <field name="aduana_clave"/>
+              <field name="patente"/>
+              <field name="clave_pedimento"/>
+              <field name="pedimento_numero"/>
+              <field name="fecha_pago"/>
+              <field name="fecha_liberacion"/>
+              <field name="semaforo"/>
+            </tree>
+
+            <form string="Pedimento">
+              <sheet>
+                <div class="oe_title">
+                  <h1>
+                    <field name="name" placeholder="Ej. EXP-000123 / OP-00045"/>
+                  </h1>
+                </div>
+
+                <group>
+                  <group string="Clasificación">
+                    <field name="lead_id" readonly="1"/>
+                    <field name="tipo_operacion"/>
+                    <field name="regimen"/>
+                    <field name="incoterm"/>
+                    <field name="aduana_clave"/>
+                    <field name="patente"/>
+                    <field name="clave_pedimento"/>
+                    <field name="currency_id"/>
+                  </group>
+
+                  <group string="Resultado">
+                    <field name="pedimento_numero"/>
+                    <field name="fecha_pago"/>
+                    <field name="semaforo"/>
+                    <field name="fecha_liberacion"/>
+                  </group>
+                </group>
+
+                <group>
+                  <group string="Observaciones">
+                    <field name="observaciones" placeholder="Notas internas del pedimento..."/>
+                  </group>
+                </group>
+              </sheet>
+            </form>
+
+          </field>
         </page>
 
       </xpath>

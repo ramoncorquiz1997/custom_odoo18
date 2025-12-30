@@ -1,0 +1,82 @@
+<odoo>
+
+  <record id="mx_ped_operacion_view_tree" model="ir.ui.view">
+    <field name="name">mx.ped.operacion.tree</field>
+    <field name="model">mx.ped.operacion</field>
+    <field name="arch" type="xml">
+      <tree>
+        <field name="name"/>
+        <field name="lead_id"/>
+        <field name="tipo_operacion"/>
+        <field name="regimen"/>
+        <field name="aduana_clave"/>
+        <field name="patente"/>
+        <field name="clave_pedimento"/>
+        <field name="pedimento_numero"/>
+        <field name="fecha_pago"/>
+        <field name="semaforo"/>
+      </tree>
+    </field>
+  </record>
+
+  <record id="mx_ped_operacion_view_form" model="ir.ui.view">
+    <field name="name">mx.ped.operacion.form</field>
+    <field name="model">mx.ped.operacion</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <div class="oe_title">
+            <h1><field name="name"/></h1>
+          </div>
+
+          <group>
+            <group string="Vinculación">
+              <field name="lead_id"/>
+            </group>
+
+            <group string="Clasificación">
+              <field name="tipo_operacion"/>
+              <field name="regimen"/>
+              <field name="incoterm"/>
+              <field name="aduana_clave"/>
+              <field name="patente"/>
+              <field name="clave_pedimento"/>
+              <field name="currency_id"/>
+            </group>
+          </group>
+
+          <group>
+            <group string="Resultado">
+              <field name="pedimento_numero"/>
+              <field name="fecha_pago"/>
+              <field name="semaforo"/>
+              <field name="fecha_liberacion"/>
+            </group>
+            <group string="Observaciones">
+              <field name="observaciones"/>
+            </group>
+          </group>
+
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="mx_ped_operacion_action" model="ir.actions.act_window">
+    <field name="name">Pedimentos</field>
+    <field name="res_model">mx.ped.operacion</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <!-- Menú opcional (si quieres verlo como app/menú aparte) -->
+  <menuitem id="mx_ped_operacion_menu_root"
+            name="Aduana"
+            sequence="90"/>
+
+  <menuitem id="mx_ped_operacion_menu"
+            name="Pedimentos"
+            parent="mx_ped_operacion_menu_root"
+            action="mx_ped_operacion_action"
+            sequence="10"/>
+
+</odoo>

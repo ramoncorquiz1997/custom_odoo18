@@ -1,16 +1,16 @@
+
 {
-    "name": "Mi Modulo",
-    "version": "18.0.1.1.0",
-    "summary": "Customizaciones base CRM y Contactos",
-    "depends": [
-        "base",
-        "contacts",
-        "crm",
-    ],
+    "name": "Aduana - Operaciones y Pedimentos",
+    "version": "18.0.1.0.0",
+    "category": "CRM",
+    "summary": "Gestión de operaciones aduanales y pedimentos desde CRM",
+    "depends": ["crm", "mail", "base", "contacts"],
     "data": [
+        "security/ir.model.access.csv",
         "views/res_partner_views.xml",
-        "views/crm_lead_views.xml",
+        "views/crm_lead_view.xml",
+        "views/mx_ped_operacion_views.xml",
     ],
-    "installable": True,
     "application": False,
+    "installable": True,
 }

@@ -1,10 +1,14 @@
-from odoo import api, fields, models
+# -*- coding: utf-8 -*-
+from odoo import api, fields, models, _
 
 
 class CrmLead(models.Model):
     _inherit = "crm.lead"
 
-    # --- Agencia aduanal (ejemplo) ---
+    # =========================================================
+    # AGENCIA ADUANAL - DATOS BASE (LEAD COMO EXPEDIENTE)
+    # =========================================================
+
     x_tipo_operacion = fields.Selection(
         selection=[
             ("importacion", "Importación"),
@@ -38,7 +42,7 @@ class CrmLead(models.Model):
         string="Incoterm",
     )
 
-    # --- Operación / mercancía (ejemplo) ---
+    # --- Operación / mercancía (legacy / resumen) ---
     x_fraccion_arancelaria = fields.Char(string="Fracción arancelaria")
 
     x_currency_id = fields.Many2one(
@@ -72,7 +76,7 @@ class CrmLead(models.Model):
         default="normal",
     )
 
-    # --- Clasificación / aduana (complemento) ---
+    # --- Clasificación / aduana (resumen / header) ---
     x_patente_agente = fields.Char(string="Patente / Agente")
 
     x_tipo_despacho = fields.Selection(
@@ -117,7 +121,6 @@ class CrmLead(models.Model):
 
     x_fecha_estimada_arribo = fields.Date(string="Fecha estimada de arribo")
     x_fecha_estimada_salida = fields.Date(string="Fecha estimada de salida")
-
     x_fecha_recoleccion = fields.Date(string="Fecha de recolección")
     x_fecha_entrega = fields.Date(string="Fecha de entrega")
 
@@ -193,7 +196,7 @@ class CrmLead(models.Model):
     x_num_contenedor = fields.Char(string="Número de contenedor")
     x_num_sello = fields.Char(string="Número de sello")
 
-    # --- Pedimento / resultado ---
+    # --- Pedimento / resultado (legacy/resumen) ---
     x_num_pedimento = fields.Char(string="Número de pedimento")
     x_fecha_pago_pedimento = fields.Date(string="Fecha de pago pedimento")
     x_fecha_liberacion = fields.Date(string="Fecha de liberación")
@@ -349,3 +352,87 @@ class CrmLead(models.Model):
     x_fecha_vuelo = fields.Date(string="Fecha de vuelo")
 
     x_prueba_entrega = fields.Boolean(string="Prueba de entrega (POD)")
+
+    # =========================================================
+    # ✅ LO CORRECTO: CRM como EXPEDIENTE + RELACIÓN A PEDIMENTOS
+    # =========================================================
+
+    x_ped_operacion_ids = fields.One2many(
+        comodel_name="mx.ped.operacion",
+        inverse_name="lead_id",
+        string="Pedimentos / Operaciones",
+        copy=False,
+    )
+
+    x_ped_operacion_count = fields.Integer(
+        compute="_compute_x_ped_operacion_count",
+        string="Pedimentos",
+    )
+
+    x_last_ped_operacion_id = fields.Many2one(
+        comodel_name="mx.ped.operacion",
+        compute="_compute_x_last_ped_operacion_id",
+        string="Último pedimento",
+    )
+
+    @api.depends("x_ped_operacion_ids")
+    def _compute_x_ped_operacion_count(self):
+        counts = self.env["mx.ped.operacion"].read_group(
+            [("lead_id", "in", self.ids)],
+            ["lead_id"],
+            ["lead_id"],
+        )
+        mapped = {c["lead_id"][0]: c["lead_id_count"] for c in counts}
+        for rec in self:
+            rec.x_ped_operacion_count = mapped.get(rec.id, 0)
+
+    @api.depends("x_ped_operacion_ids")
+    def _compute_x_last_ped_operacion_id(self):
+        for rec in self:
+            rec.x_last_ped_operacion_id = rec.x_ped_operacion_ids.sorted(
+                key=lambda r: r.create_date or fields.Datetime.now(),
+                reverse=True
+            )[:1] or False
+
+    def action_crear_pedimento(self):
+        """
+        Crea una cabecera (mx.ped.operacion) desde el lead copiando datos base.
+        El lead sigue siendo el EXPEDIENTE; el pedimento vive en su modelo.
+        """
+        self.ensure_one()
+
+        currency = self.x_currency_id or self.env.company.currency_id
+
+        # nombre humano del pedimento (si no hay numero aún)
+        name = self.x_num_pedimento or self.x_folio_operacion or self.name or _("Operación")
+
+        op = self.env["mx.ped.operacion"].create({
+            "lead_id": self.id,
+            "name": name,
+
+            "tipo_operacion": self.x_tipo_operacion,
+            "regimen": self.x_regimen,
+            "incoterm": self.x_incoterm,
+
+            # si después lo conviertes a catálogo, aquí lo cambias por Many2one
+            "aduana_clave": (self.x_aduana or ""),
+            "patente": (self.x_patente_agente or ""),
+            "clave_pedimento": (self.x_clave_pedimento or ""),
+
+            "currency_id": currency.id,
+
+            "pedimento_numero": (self.x_num_pedimento or ""),
+            "fecha_pago": self.x_fecha_pago_pedimento,
+            "fecha_liberacion": self.x_fecha_liberacion,
+            "semaforo": self.x_semaforo,
+            "observaciones": (self.x_incidente_text or ""),
+        })
+
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Pedimento"),
+            "res_model": "mx.ped.operacion",
+            "view_mode": "form",
+            "res_id": op.id,
+            "target": "current",
+        }
