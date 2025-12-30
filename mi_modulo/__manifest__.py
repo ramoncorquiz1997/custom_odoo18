@@ -1,7 +1,7 @@
 
 {
     "name": "Aduana - Operaciones y Pedimentos",
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "CRM",
     "summary": "Gestión de operaciones aduanales y pedimentos desde CRM",
     "depends": ["crm", "mail", "base", "contacts"],
