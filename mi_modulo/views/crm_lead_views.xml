@@ -58,7 +58,21 @@
               </group>
             </group>
           </page>
-
+          
+          <page string="Mercancías" name="mx_ped_partidas">
+            <field name="partida_ids" nolabel="1" context="{'default_operacion_id': id}">
+              <list editable="bottom">
+                <field name="numero_partida"/>
+                <field name="fraccion_arancelaria"/>
+                <field name="descripcion"/>
+                <field name="cantidad_comercial"/>
+                <field name="unidad_comercial"/>
+                <field name="valor_comercial"/>
+                <field name="valor_aduana"/>
+              </list>
+            </field>
+          </page>
+         
           <page string="Logística" name="mi_modulo_logistica">
             <group>
               <group string="Ruta">
