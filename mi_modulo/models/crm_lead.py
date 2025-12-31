@@ -375,6 +375,76 @@ class CrmLead(models.Model):
         string="Último pedimento",
     )
 
+        # =========================================================
+    # ✅ RESUMEN (READ-ONLY) DEL ÚLTIMO PEDIMENTO PARA EL FORM DEL LEAD
+    # =========================================================
+
+    x_ped_num_pedimento = fields.Char(
+        string="Número de pedimento (último)",
+        compute="_compute_x_ped_resumen",
+        store=False,
+        readonly=True,
+    )
+    x_ped_fecha_pago = fields.Date(
+        string="Fecha de pago (último)",
+        compute="_compute_x_ped_resumen",
+        store=False,
+        readonly=True,
+    )
+    x_ped_semaforo = fields.Selection(
+        selection=[("verde", "Verde"), ("rojo", "Rojo")],
+        string="Semáforo (último)",
+        compute="_compute_x_ped_resumen",
+        store=False,
+        readonly=True,
+    )
+    x_ped_fecha_liberacion = fields.Date(
+        string="Fecha de liberación (último)",
+        compute="_compute_x_ped_resumen",
+        store=False,
+        readonly=True,
+    )
+
+    x_ped_aduana_clave = fields.Char(
+        string="Aduana (clave, último)",
+        compute="_compute_x_ped_resumen",
+        store=False,
+        readonly=True,
+    )
+    x_ped_patente = fields.Char(
+        string="Patente (último)",
+        compute="_compute_x_ped_resumen",
+        store=False,
+        readonly=True,
+    )
+    x_ped_clave_pedimento = fields.Char(
+        string="Clave pedimento (último)",
+        compute="_compute_x_ped_resumen",
+        store=False,
+        readonly=True,
+    )
+
+    @api.depends(
+        "x_last_ped_operacion_id",
+        "x_last_ped_operacion_id.pedimento_numero",
+        "x_last_ped_operacion_id.fecha_pago",
+        "x_last_ped_operacion_id.semaforo",
+        "x_last_ped_operacion_id.fecha_liberacion",
+        "x_last_ped_operacion_id.aduana_clave",
+        "x_last_ped_operacion_id.patente",
+        "x_last_ped_operacion_id.clave_pedimento",
+    )
+    def _compute_x_ped_resumen(self):
+        for rec in self:
+            op = rec.x_last_ped_operacion_id
+            rec.x_ped_num_pedimento = op.pedimento_numero if op else False
+            rec.x_ped_fecha_pago = op.fecha_pago if op else False
+            rec.x_ped_semaforo = op.semaforo if op else False
+            rec.x_ped_fecha_liberacion = op.fecha_liberacion if op else False
+            rec.x_ped_aduana_clave = op.aduana_clave if op else False
+            rec.x_ped_patente = op.patente if op else False
+            rec.x_ped_clave_pedimento = op.clave_pedimento if op else False
+
     @api.depends("x_ped_operacion_ids")
     def _compute_x_ped_operacion_count(self):
         counts = self.env["mx.ped.operacion"].read_group(
