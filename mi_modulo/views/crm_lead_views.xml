@@ -165,7 +165,7 @@
 
             <group>
               <group string="Nota">
-                <label string="Para editar/crear pedimentos usa la pestaña 'Pedimentos'."/>
+                <div class="o_form_label">Para editar/crear pedimentos usa la pestaña 'Pedimentos'.</div>
               </group>
             </group>
           </page>
