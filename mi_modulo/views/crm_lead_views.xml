@@ -14,7 +14,7 @@
                   name="%(mi_modulo.mx_ped_operacion_action)d"
                   class="oe_stat_button"
                   icon="fa-file-text-o"
-                  context="{'search_default_lead_id': id}"
+                  context="{'search_default_lead_id': id}">
             <field string="Pedimentos" name="x_ped_operacion_count" widget="statinfo"/>
           </button>
         </xpath>
@@ -266,9 +266,9 @@
             </group>
 
             <field name="x_ped_operacion_ids"
-              nolabel="1"
-              context="{'default_lead_id': id}"
-              mode="list,form">
+                   nolabel="1"
+                   context="{'default_lead_id': id}"
+                   mode="list,form">
 
               <list editable="bottom">
                 <field name="name"/>
