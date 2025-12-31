@@ -5,19 +5,17 @@
     <record id="crm_lead_view_form_inherit_mi_modulo_aduana" model="ir.ui.view">
       <field name="name">crm.lead.form.inherit.mi_modulo.aduana</field>
       <field name="model">crm.lead</field>
-      <field name="inherit_id" ref="crm.crm_lead_view_form"/></field>
+      <field name="inherit_id" ref="crm.crm_lead_view_form"/>
       <field name="arch" type="xml">
 
         <!-- SMART BUTTON -->
-        <xpath expr="//div[contains(@class,'oe_button_box')]" position="inside">
-          <button
-            type="action"
-            name="%(mi_modulo.mx_ped_operacion_action)d"
-            class="oe_stat_button"
-            icon="fa-file-text-o"
-            context="{'default_lead_id': active_id, 'search_default_lead_id': active_id}"
-          >
-            <field name="x_ped_operacion_count" widget="statinfo" string="Pedimentos"/>
+        <xpath expr="//div[@class='oe_button_box']" position="inside">
+          <button type="action"
+                  name="%(mi_modulo.mx_ped_operacion_action)d"
+                  class="oe_stat_button"
+                  icon="fa-file-text-o"
+                  context="{'search_default_lead_id': active_id}">
+            <field string="Pedimentos" name="x_ped_operacion_count" widget="statinfo"/>
           </button>
         </xpath>
 
@@ -322,6 +320,7 @@
           </page>
 
         </xpath>
+
       </field>
     </record>
 
