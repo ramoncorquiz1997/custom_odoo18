@@ -2,12 +2,12 @@
 <odoo>
   <data>
 
-    <!-- TREE -->
-    <record id="mx_ped_operacion_view_tree" model="ir.ui.view">
-      <field name="name">mx.ped.operacion.tree</field>
+    <!-- LIST -->
+    <record id="mx_ped_operacion_view_list" model="ir.ui.view">
+      <field name="name">mx.ped.operacion.list</field>
       <field name="model">mx.ped.operacion</field>
       <field name="arch" type="xml">
-        <tree>
+        <list>
           <field name="name"/>
           <field name="lead_id"/>
           <field name="tipo_operacion"/>
@@ -18,7 +18,7 @@
           <field name="pedimento_numero"/>
           <field name="fecha_pago"/>
           <field name="semaforo"/>
-        </tree>
+        </list>
       </field>
     </record>
 
@@ -30,7 +30,7 @@
         <form string="Pedimento">
           <sheet>
             <div class="oe_title">
-              <h1><field name="name" placeholder="Ej. OP-000123"/></h1>
+              <h1><field name="name" placeholder="Ej. OP-0001"/></h1>
             </div>
 
             <group>
@@ -58,7 +58,7 @@
               </group>
 
               <group string="Observaciones">
-                <field name="observaciones" placeholder="Notas internas..."/>
+                <field name="observaciones"/>
               </group>
             </group>
 
@@ -71,12 +71,10 @@
     <record id="mx_ped_operacion_action" model="ir.actions.act_window">
       <field name="name">Pedimentos</field>
       <field name="res_model">mx.ped.operacion</field>
-      <field name="view_mode">tree,form</field>
-      <!-- opcional: filtra por lead si vienes desde el stat button -->
-      <field name="context">{}</field>
+      <field name="view_mode">list,form</field>
     </record>
 
-    <!-- MENUS (opcional) -->
+    <!-- MENÚ -->
     <menuitem id="mx_ped_operacion_menu_root" name="Aduana" sequence="90"/>
     <menuitem id="mx_ped_operacion_menu"
               name="Pedimentos"

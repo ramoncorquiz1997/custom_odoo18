@@ -2,12 +2,29 @@
 <odoo>
   <data>
 
-    <record id="crm_lead_view_form_inherit_mi_modulo_aduana" model="ir.ui.view">
+    <record id="crm_lead_view_form_inherit_mi_modulo" model="ir.ui.view">
       <field name="name">crm.lead.form.inherit.mi_modulo.aduana</field>
       <field name="model">crm.lead</field>
       <field name="inherit_id" ref="crm.crm_lead_view_form"/>
       <field name="arch" type="xml">
 
+        <!-- SMART BUTTON -->
+        <xpath expr="//div[@class='oe_button_box']" position="inside">
+          <button type="action"
+                  name="%(mi_modulo.mx_ped_operacion_action)d"
+                  class="oe_stat_button"
+                  icon="fa-file-text-o"
+                  context="{'search_default_lead_id': active_id}">
+            <field string="Pedimentos" name="x_ped_operacion_count" widget="statinfo"/>
+          </button>
+        </xpath>
+
+        <!-- BOTÓN EN HEADER -->
+        <xpath expr="//header" position="inside">
+          <button name="action_crear_pedimento" type="object" string="Crear pedimento" class="btn-primary"/>
+        </xpath>
+
+        <!-- TABS -->
         <xpath expr="//notebook" position="inside">
 
           <page string="Operación" name="mi_modulo_operacion">
@@ -31,7 +48,7 @@
               <group string="Clasificación">
                 <field name="x_regimen"/>
                 <field name="x_tipo_despacho"/>
-                <field name="x_aduana" placeholder="Ej. Tijuana, Ensenada, Lázaro Cárdenas"/>
+                <field name="x_aduana" placeholder="Ej. 070 / Tijuana"/>
                 <field name="x_patente_agente"/>
                 <field name="x_clave_pedimento"/>
               </group>
@@ -116,7 +133,8 @@
               <group string="Guías">
                 <field name="x_bl_awb"/>
                 <field name="x_house_bl_awb"/>
-                <field name="x_booking" modifiers='{"invisible":[["x_modo_transporte","!=","maritimo"]]}'/>
+                <field name="x_booking"
+                       modifiers='{"invisible":[["x_modo_transporte","!=","maritimo"]]}'/>
               </group>
               <group string="Equipo">
                 <field name="x_num_contenedor"/>
@@ -125,124 +143,16 @@
             </group>
           </page>
 
-          <page string="Pedimento" name="mi_modulo_pedimento">
-            <group>
-              <group string="Datos">
-                <field name="x_num_pedimento"/>
-                <field name="x_fecha_pago_pedimento"/>
-                <field name="x_semaforo"/>
-                <field name="x_fecha_liberacion"/>
-              </group>
-              <group string="Incidencias">
-                <field name="x_incidente_text" placeholder="Describe incidencias, rectificaciones, revisiones, etc."/>
-              </group>
-            </group>
-          </page>
-
-          <page string="Facturación" name="mi_modulo_facturacion">
-            <group>
-              <group string="Cobro">
-                <field name="x_factura_emitida"/>
-                <field name="x_factura_ref" modifiers='{"invisible":[["x_factura_emitida","=",false]]}'/>
-                <field name="x_metodo_cobro"/>
-                <field name="x_pago_confirmado"/>
-              </group>
-              <group string="Notas internas">
-                <field name="description" placeholder="Agrega observaciones relevantes de la operación..."/>
-              </group>
-            </group>
-          </page>
-
-          <page string="Importación" name="mi_modulo_importacion"
-                modifiers='{"invisible":[["x_tipo_operacion","!=","importacion"]]}'>
-
-            <group>
-              <group string="Compra / proveedor">
-                <field name="x_purchase_order"/>
-                <field name="x_proveedor_invoice_number"/>
-                <field name="x_condiciones_pago"/>
-                <field name="x_tipo_compra"/>
-              </group>
-              <group string="Regulaciones">
-                <field name="x_permisos_ids" widget="many2many_tags"/>
-                <field name="x_normas_noms_text"/>
-                <field name="x_etiquetado"/>
-                <field name="x_cumplimiento_noms"/>
-                <field name="x_certificado_origen"/>
-                <field name="x_tratado_aplicable"/>
-                <field name="x_pedimento_rectificacion"/>
-              </group>
-            </group>
-
-            <group>
-              <group string="Impuestos (estimados)">
-                <field name="x_iva_estimado"/>
-                <field name="x_igi_estimado"/>
-                <field name="x_dta_estimado"/>
-                <field name="x_prv_estimado"/>
-                <field name="x_total_impuestos_estimado"/>
-                <field name="x_total_pagado_real"/>
-              </group>
-              <group string="Recinto / entrega">
-                <field name="x_recinto_fiscalizado"/>
-                <field name="x_almacenaje"/>
-                <field name="x_citas_almacen"/>
-                <field name="x_transportista_entrega"/>
-                <field name="x_direccion_entrega_final"/>
-              </group>
-            </group>
-
-          </page>
-
-          <page string="Exportación" name="mi_modulo_exportacion"
-                modifiers='{"invisible":[["x_tipo_operacion","!=","exportacion"]]}'>
-
-            <group>
-              <group string="Venta">
-                <field name="x_sales_order"/>
-                <field name="x_invoice_export_number"/>
-                <field name="x_cliente_extranjero_name"/>
-                <field name="x_direccion_destino_final"/>
-                <field name="x_condiciones_venta"/>
-              </group>
-              <group string="Compliance">
-                <field name="x_regulaciones_exportacion_ids" widget="many2many_tags"/>
-                <field name="x_certificados_exportacion_ids" widget="many2many_tags"/>
-                <field name="x_licencia_exportacion"/>
-                <field name="x_motivo_exportacion"/>
-              </group>
-            </group>
-
-            <group>
-              <group string="Salida">
-                <field name="x_punto_salida"/>
-                <field name="x_transportista_salida"/>
-                <field name="x_fecha_cruce"/>
-                <field name="x_fecha_zarpe"/>
-                <field name="x_fecha_vuelo"/>
-                <field name="x_prueba_entrega"/>
-              </group>
-            </group>
-
-          </page>
-
-          <!-- ✅ Pedimentos (alta/edición real) -->
+          <!-- ✅ Pedimentos relacionados -->
           <page string="Pedimentos" name="mi_modulo_pedimentos_rel">
             <group>
               <group string="Acciones">
-                <button name="action_crear_pedimento"
-                        type="object"
-                        string="Crear pedimento desde este lead"
-                        class="btn-primary"/>
+                <button name="action_crear_pedimento" type="object" string="Crear pedimento desde este lead" class="btn-primary"/>
               </group>
             </group>
 
-            <field name="x_ped_operacion_ids"
-                   nolabel="1"
-                   context="{'default_lead_id': active_id}"
-                   mode="tree,form">
-
-              <tree editable="bottom">
+            <field name="x_ped_operacion_ids" nolabel="1" context="{'default_lead_id': active_id}" mode="list,form">
+              <list editable="bottom">
                 <field name="name"/>
                 <field name="tipo_operacion"/>
                 <field name="regimen"/>
@@ -253,14 +163,12 @@
                 <field name="fecha_pago"/>
                 <field name="fecha_liberacion"/>
                 <field name="semaforo"/>
-              </tree>
+              </list>
 
               <form string="Pedimento">
                 <sheet>
                   <div class="oe_title">
-                    <h1>
-                      <field name="name" placeholder="Ej. OP-000123"/>
-                    </h1>
+                    <h1><field name="name" placeholder="Ej. OP-0001"/></h1>
                   </div>
 
                   <group>
@@ -285,14 +193,12 @@
 
                   <group>
                     <group string="Observaciones">
-                      <field name="observaciones" placeholder="Notas internas..."/>
+                      <field name="observaciones"/>
                     </group>
                   </group>
                 </sheet>
               </form>
-
             </field>
-
           </page>
 
         </xpath>
